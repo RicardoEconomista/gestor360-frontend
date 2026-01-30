@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Gestor Financeiro 360°</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0066cc 0%, #004c99 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #0066cc 0%, #004c99 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .login-form {
+            padding: 40px 30px;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #0066cc;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #999;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: #0066cc;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .forgot-password a {
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #004c99;
+            text-decoration: underline;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0066cc 0%, #004c99 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 16px;
+            color: #999;
+            font-size: 13px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-link {
+            text-align: center;
+            padding: 20px 0;
+            background: #f8f9fa;
+            margin: 0 -30px -40px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .signup-link p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #004c99;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 16px;
+            }
+
+            .login-header {
+                padding: 30px 20px;
+            }
+
+            .logo {
+                font-size: 26px;
+            }
+
+            .login-form {
+                padding: 30px 20px;
+            }
+
+            .form-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">💼 Gestor Financeiro 360°</div>
+            <div class="logo-subtitle">Diagnóstico Completo 80 Perguntas</div>
+        </div>
+
+        <div class="login-form">
+            <h1 class="form-title">Bem-vindo de volta!</h1>
+            <p class="form-subtitle">Entre com suas credenciais para continuar</p>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="seu@email.com"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Senha</label>
+                    <div class="password-container">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-input" 
+                            placeholder="••••••••"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            👁️ Mostrar
+                        </button>
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#" onclick="alert('Funcionalidade em breve!'); return false;">Esqueceu a senha?</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" id="btnLogin">
+                    Entrar
+                </button>
+
+                <div class="loading" id="loading">Entrando</div>
+            </form>
+
+            <div class="signup-link">
+                <p>Não tem uma conta? <a href="cadastro.html">Criar conta agora</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO SUPABASE
+        // ============================================
+        const SUPABASE_URL = 'https://tdclvlukfckkibwlbgwo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkY2x2bHVrZmNra2lid2xiZ3dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc5ODk2MDksImV4cCI6MjA1MzU2NTYwOX0.SSavf8vriHMr7WWQ9SO1Cg_cUxdQoRr30HdwS7aUi1s';
+        
+        // Criar cliente Supabase (usando namespace global do CDN)
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================
+        // FUNÇÃO: TOGGLE PASSWORD
+        // ============================================
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈 Ocultar';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️ Mostrar';
+            }
+        }
+
+        // ============================================
+        // FUNÇÃO: MOSTRAR ERRO
+        // ============================================
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // ============================================
+        // FUNÇÃO: MOSTRAR SUCESSO
+        // ============================================
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // ============================================
+        // FUNÇÃO: LOGIN
+        // ============================================
+        async function fazerLogin(email, senha) {
+            try {
+                console.log('🔐 Tentando fazer login...');
+                
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: senha
+                });
+
+                if (error) {
+                    console.error('❌ Erro no login:', error);
+                    throw error;
+                }
+
+                console.log('✅ Login bem-sucedido!');
+                console.log('👤 Usuário:', data.user.email);
+                console.log('🎫 Token:', data.session.access_token.substring(0, 20) + '...');
+
+                // Salvar token no localStorage
+                localStorage.setItem('supabase_token', data.session.access_token);
+                localStorage.setItem('user_email', data.user.email);
+                localStorage.setItem('user_id', data.user.id);
+                localStorage.setItem('user_nome', data.user.user_metadata?.nome || 'Usuário');
+
+                return data;
+            } catch (error) {
+                console.error('❌ Erro ao fazer login:', error);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // EVENTO: SUBMIT DO FORM
+        // ============================================
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btnLogin');
+            const loading = document.getElementById('loading');
+
+            // Validação básica
+            if (!email || !senha) {
+                showError('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            if (senha.length < 6) {
+                showError('A senha deve ter pelo menos 6 caracteres!');
+                return;
+            }
+
+            // Desabilitar botão e mostrar loading
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Entrando...';
+            loading.style.display = 'block';
+
+            try {
+                // Fazer login
+                await fazerLogin(email, senha);
+
+                // Sucesso!
+                showSuccess('Login realizado com sucesso! Redirecionando...');
+                
+                // Redirecionar após 1 segundo
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+
+            } catch (error) {
+                // Erro!
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Entrar';
+                loading.style.display = 'none';
+
+                if (error.message.includes('Invalid login credentials')) {
+                    showError('Email ou senha incorretos!');
+                } else if (error.message.includes('Email not confirmed')) {
+                    showError('Por favor, confirme seu email antes de fazer login!');
+                } else {
+                    showError('Erro ao fazer login. Tente novamente!');
+                }
+            }
+        });
+
+        // ============================================
+        // VERIFICAR SE JÁ ESTÁ LOGADO
+        // ============================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('supabase_token');
+            
+            if (token) {
+                console.log('✅ Usuário já está logado! Redirecionando...');
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
