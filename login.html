@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gestor Financeiro 360°</title>
+    
+    <!-- Supabase JavaScript Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            color: #999;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: #fee;
+            border: 2px solid #fcc;
+            color: #c00;
+        }
+
+        .alert-success {
+            background: #efe;
+            border: 2px solid #cfc;
+            color: #070;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle input {
+            padding-right: 45px;
+        }
+
+        .password-toggle button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+            color: #667eea;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🎯 Gestor Financeiro 360°</h1>
+            <p>Diagnóstico Financeiro Empresarial</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="seu@email.com"
+                    required
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <div class="password-toggle">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="••••••••"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button type="button" id="togglePassword">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login" id="btnLogin">
+                Entrar
+            </button>
+
+            <div class="loading" id="loading">
+                <span class="spinner"></span>
+                <span>Autenticando...</span>
+            </div>
+        </form>
+
+        <div class="divider">ou</div>
+
+        <div class="signup-link">
+            Não tem conta? <a href="cadastro.html">Criar conta</a>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO DO SUPABASE
+        // ============================================
+        const SUPABASE_URL = 'https://eggyabjkdgkotkrjjmbg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVnZ3lhYmprZGdrb3RrcmpqbWJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4MjMyMDYsImV4cCI6MjA4NTM5OTIwNn0.yJqjB7rMuIlKteRzZBGm1bDtUA8ZlAB29bkD8-s0Qjg';
+
+        // Criar cliente Supabase
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================
+        // ELEMENTOS DO DOM
+        // ============================================
+        const loginForm = document.getElementById('loginForm');
+        const btnLogin = document.getElementById('btnLogin');
+        const loading = document.getElementById('loading');
+        const alertContainer = document.getElementById('alertContainer');
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        // ============================================
+        // FUNÇÕES DE ALERTA
+        // ============================================
+        function mostrarAlerta(mensagem, tipo = 'error') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${tipo}`;
+            alertDiv.textContent = mensagem;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+
+            // Remover após 5 segundos
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // ============================================
+        // TOGGLE SENHA (MOSTRAR/OCULTAR)
+        // ============================================
+        togglePassword.addEventListener('click', function() {
+            const tipo = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = tipo;
+            this.textContent = tipo === 'password' ? '👁️' : '🙈';
+        });
+
+        // ============================================
+        // VERIFICAR SE JÁ ESTÁ LOGADO
+        // ============================================
+        async function verificarSessao() {
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (session) {
+                    console.log('✅ Usuário já está logado, redirecionando...');
+                    window.location.href = 'index.html.html';
+                }
+            } catch (erro) {
+                console.error('Erro ao verificar sessão:', erro);
+            }
+        }
+
+        // Verificar ao carregar a página
+        verificarSessao();
+
+        // ============================================
+        // FUNÇÃO DE LOGIN
+        // ============================================
+        async function fazerLogin(email, senha) {
+            try {
+                console.log('🔐 Tentando fazer login com:', email);
+
+                // Fazer login no Supabase
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: senha
+                });
+
+                if (error) {
+                    console.error('❌ Erro ao fazer login:', error);
+                    throw error;
+                }
+
+                console.log('✅ Login bem-sucedido!', data);
+
+                // Salvar token no localStorage
+                if (data.session) {
+                    localStorage.setItem('supabase_token', data.session.access_token);
+                    localStorage.setItem('user_id', data.user.id);
+                    localStorage.setItem('user_email', data.user.email);
+                }
+
+                // Mostrar sucesso
+                mostrarAlerta('Login realizado com sucesso! Redirecionando...', 'success');
+
+                // Redirecionar após 1 segundo
+                setTimeout(() => {
+                    window.location.href = 'index.html.html';
+                }, 1000);
+
+            } catch (erro) {
+                console.error('❌ Erro no login:', erro);
+                
+                // Mensagens de erro amigáveis
+                let mensagem = 'Erro ao fazer login. Tente novamente.';
+                
+                if (erro.message.includes('Invalid login credentials')) {
+                    mensagem = 'Email ou senha incorretos.';
+                } else if (erro.message.includes('Email not confirmed')) {
+                    mensagem = 'Por favor, confirme seu email antes de fazer login.';
+                } else if (erro.message.includes('network')) {
+                    mensagem = 'Erro de conexão. Verifique sua internet.';
+                }
+
+                mostrarAlerta(mensagem, 'error');
+                throw erro;
+            }
+        }
+
+        // ============================================
+        // SUBMIT DO FORMULÁRIO
+        // ============================================
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('password').value;
+
+            // Validações básicas
+            if (!email || !senha) {
+                mostrarAlerta('Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                mostrarAlerta('Por favor, insira um email válido.', 'error');
+                return;
+            }
+
+            // Desabilitar botão e mostrar loading
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Entrando...';
+            loading.style.display = 'block';
+
+            try {
+                await fazerLogin(email, senha);
+            } catch (erro) {
+                // Erro já foi tratado na função fazerLogin
+            } finally {
+                // Reabilitar botão
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Entrar';
+                loading.style.display = 'none';
+            }
+        });
+
+        // ============================================
+        // LOG DE INICIALIZAÇÃO
+        // ============================================
+        console.log('🚀 Sistema de Login inicializado!');
+        console.log('📍 Supabase URL:', SUPABASE_URL);
+        console.log('✅ Cliente Supabase conectado!');
+    </script>
+</body>
+</html>
