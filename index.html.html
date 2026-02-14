@@ -11362,8 +11362,8 @@ async function salvarEmpresa() {
         // Pegar dados do formulário
         const nomeEmpresa = document.getElementById('empresa-nome')?.value?.trim() || '';
         const responsavel = document.getElementById('empresa-responsavel')?.value?.trim() || '';
-        const setor = document.getElementById('setor')?.value || '';
-        const porteSelect = document.getElementById('porte')?.value || '';
+        const setor = document.getElementById('empresa-setor')?.value || '';
+        const porteSelect = document.getElementById('empresa-porte')?.value || '';
         const faturamento = parseFloat(document.getElementById('empresa-faturamento')?.value || 0);
         const cidadeEstado = document.getElementById('empresa-cidade')?.value?.trim() || '';
         
