@@ -11360,12 +11360,12 @@ async function salvarEmpresa() {
         console.log('🔥 Iniciando salvamento de empresa...');
         
         // Pegar dados do formulário
-        const nomeEmpresa = document.getElementById('nome-empresa').value.trim();
-        const responsavel = document.getElementById('responsavel').value.trim();
-        const setor = document.getElementById('setor').value;
-        const porteSelect = document.getElementById('porte').value;
-        const faturamento = parseFloat(document.getElementById('faturamento').value);
-        const cidadeEstado = document.getElementById('cidade')?.value?.trim() || '';
+        const nomeEmpresa = document.getElementById('empresa-nome')?.value?.trim() || '';
+        const responsavel = document.getElementById('empresa-responsavel')?.value?.trim() || '';
+        const setor = document.getElementById('setor')?.value || '';
+        const porteSelect = document.getElementById('porte')?.value || '';
+        const faturamento = parseFloat(document.getElementById('empresa-faturamento')?.value || 0);
+        const cidadeEstado = document.getElementById('empresa-cidade')?.value?.trim() || '';
         
         // Validações básicas
         if (!nomeEmpresa) {
