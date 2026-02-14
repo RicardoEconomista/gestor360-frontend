@@ -11365,7 +11365,7 @@ async function salvarEmpresa() {
         const setor = document.getElementById('setor').value;
         const porteSelect = document.getElementById('porte').value;
         const faturamento = parseFloat(document.getElementById('faturamento').value);
-        const cidadeEstado = document.getElementById('cidade-estado').value.trim();
+        const cidadeEstado = document.getElementById('cidade')?.value?.trim() || '';
         
         // Validações básicas
         if (!nomeEmpresa) {
@@ -11411,10 +11411,10 @@ async function salvarEmpresa() {
             setor: setor,
             porte: porteFormatado,
             faturamento_anual: faturamentoAnual,
-            dados_completos: {
-                responsavel: responsavel || '',
-                cidade_estado: cidadeEstado || ''
-            }
+           dados_completos: {
+    responsavel: responsavel || '',
+    cidade: cidadeEstado || ''
+}
         };
         
         // Pegar token
