@@ -11355,41 +11355,134 @@ function fecharModalEmpresa() {
 }
 
 // Salvar empresa (criar ou atualizar)
-function salvarEmpresa(event) {
-    event.preventDefault();
-    
-    const dados = {
-        nome: document.getElementById('empresa-nome').value.trim(),
-        responsavel: document.getElementById('empresa-responsavel').value.trim(),
-        setor: document.getElementById('empresa-setor').value,
-        porte: document.getElementById('empresa-porte').value,
-        faturamento: document.getElementById('empresa-faturamento').value.trim(),
-        cidade: document.getElementById('empresa-cidade').value.trim()
-    };
-    
-    const idEdit = document.getElementById('empresa-id-edit').value;
-    
-    let sucesso;
-    if (idEdit) {
-        // Atualizar
-        sucesso = EmpresasManager.update(idEdit, dados);
-        if (sucesso) {
-            alert('✅ Empresa atualizada com sucesso!');
+async function salvarEmpresa() {
+    try {
+        console.log('🔥 Iniciando salvamento de empresa...');
+        
+        // Pegar dados do formulário
+        const nomeEmpresa = document.getElementById('nome-empresa').value.trim();
+        const responsavel = document.getElementById('responsavel').value.trim();
+        const setor = document.getElementById('setor').value;
+        const porteSelect = document.getElementById('porte').value;
+        const faturamento = parseFloat(document.getElementById('faturamento').value);
+        const cidadeEstado = document.getElementById('cidade-estado').value.trim();
+        
+        // Validações básicas
+        if (!nomeEmpresa) {
+            alert('⚠️ Nome da empresa é obrigatório!');
+            return;
         }
-    } else {
-        // Criar nova
-        const empresa = EmpresasManager.create(dados);
-        if (empresa) {
-            alert(`✅ Empresa cadastrada com sucesso!\n\n📊 ${empresa.nome}\n\nAgora você pode começar a fazer diagnósticos!`);
-            sucesso = true;
+        
+        if (!setor) {
+            alert('⚠️ Setor é obrigatório!');
+            return;
+        }
+        
+        if (!porteSelect) {
+            alert('⚠️ Porte é obrigatório!');
+            return;
+        }
+        
+        // Converter porte para formato correto do banco
+        let porteFormatado;
+        if (porteSelect === 'micro' || porteSelect === 'Micro') {
+            porteFormatado = 'Micro';
+        } else if (porteSelect === 'pequena' || porteSelect === 'Pequena' || porteSelect === 'pequeno') {
+            porteFormatado = 'Pequena';
+        } else if (porteSelect === 'media' || porteSelect === 'Média' || porteSelect === 'medio') {
+            porteFormatado = 'Media';
         } else {
-            sucesso = false;
+            porteFormatado = 'Pequena'; // default
         }
-    }
-    
-    if (sucesso) {
-        fecharModalEmpresa();
-        renderDashboardEmpresas();
+        
+        // Converter faturamento mensal para anual
+        const faturamentoAnual = faturamento * 12;
+        
+        console.log('📊 Dados coletados:', {
+            nomeEmpresa,
+            setor,
+            porte: porteFormatado,
+            faturamentoAnual
+        });
+        
+        // Preparar objeto para enviar ao backend
+        const empresaData = {
+            nome_empresa: nomeEmpresa,
+            setor: setor,
+            porte: porteFormatado,
+            faturamento_anual: faturamentoAnual,
+            dados_completos: {
+                responsavel: responsavel || '',
+                cidade_estado: cidadeEstado || ''
+            }
+        };
+        
+        // Pegar token
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('⚠️ Sessão expirada. Faça login novamente.');
+            irPara('login');
+            return;
+        }
+        
+        console.log('🚀 Enviando para backend:', BACKEND_URL + '/empresas');
+        
+        // Fazer POST para o backend
+        const response = await fetch(`${BACKEND_URL}/empresas`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(empresaData)
+        });
+        
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('❌ Erro do backend:', errorData);
+            throw new Error(errorData.error || `Erro HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ Resposta do backend:', data);
+        
+        if (!data.empresa || !data.empresa.id) {
+            throw new Error('Backend não retornou ID da empresa');
+        }
+        
+        // Salvar no localStorage DEPOIS de confirmar que salvou no backend
+        const empresaId = data.empresa.id;
+        localStorage.setItem('empresa_ativa', empresaId);
+        
+        // Criar objeto diagnóstico para localStorage
+        const diagnostico = {
+            empresa_id: empresaId,
+            nome_empresa: nomeEmpresa,
+            setor: setor,
+            porte: porteSelect, // usa o valor original para o diagnóstico
+            faturamento_mensal: faturamento,
+            responsavel: responsavel,
+            cidade_estado: cidadeEstado
+        };
+        
+        localStorage.setItem('diagnostico', JSON.stringify(diagnostico));
+        
+        console.log('💾 Salvo no localStorage:', empresaId);
+        
+        // Mostrar mensagem de sucesso
+        alert('✅ Empresa salva com sucesso!');
+        
+        // Recarregar lista de empresas
+        await carregarEmpresas();
+        
+        // Ir para diagnóstico
+        irPara('diagnostico');
+        
+    } catch (error) {
+        console.error('❌ Erro ao salvar empresa:', error);
+        alert(`❌ Erro ao salvar empresa: ${error.message}\n\nVerifique o console (F12) para mais detalhes.`);
     }
 }
 
