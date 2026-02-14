@@ -11354,36 +11354,94 @@ function fecharModalEmpresa() {
     document.getElementById('form-empresa').reset();
 }
 
-// Salvar empresa (criar ou atualizar)
+// ═══════════════════════════════════════════════════════════════════
+// FUNÇÃO salvarEmpresa() CORRETA PARA O FRONTEND
+// ═══════════════════════════════════════════════════════════════════
+// INSTRUÇÕES:
+// 1. GitHub → gestor360-frontend → index.html.html → Edit
+// 2. Ctrl+F: "function salvarEmpresa"
+// 3. DELETAR a função inteira (da linha que tem "function salvarEmpresa()" 
+//    até o "}" que fecha ela)
+// 4. COLAR esta função no lugar
+// 5. Commit e aguardar deploy
+// ═══════════════════════════════════════════════════════════════════
+
 async function salvarEmpresa() {
     try {
         console.log('🔥 Iniciando salvamento de empresa...');
         
-        // Pegar dados do formulário
-        const nomeEmpresa = document.getElementById('empresa-nome')?.value?.trim() || '';
-        const responsavel = document.getElementById('empresa-responsavel')?.value?.trim() || '';
-        const setor = document.getElementById('empresa-setor')?.value || '';
-        const porteSelect = document.getElementById('empresa-porte')?.value || '';
-        const faturamento = parseFloat(document.getElementById('empresa-faturamento')?.value || 0);
-        const cidadeEstado = document.getElementById('empresa-cidade')?.value?.trim() || '';
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 1: PEGAR DADOS DO FORMULÁRIO
+        // ═══════════════════════════════════════════════════════════════
         
-        // Validações básicas
+        console.log('📋 Coletando dados do formulário...');
+        
+        // Tentar pegar com prefixo "empresa-" primeiro (modal)
+        let nomeEmpresa = document.getElementById('empresa-nome')?.value?.trim();
+        let responsavel = document.getElementById('empresa-responsavel')?.value?.trim();
+        let setor = document.getElementById('empresa-setor')?.value;
+        let porteSelect = document.getElementById('empresa-porte')?.value;
+        let faturamento = document.getElementById('empresa-faturamento')?.value;
+        let cidade = document.getElementById('empresa-cidade')?.value?.trim();
+        
+        // Se não encontrar, tentar sem prefixo (formulário principal)
+        if (!nomeEmpresa) {
+            nomeEmpresa = document.getElementById('nome-empresa')?.value?.trim();
+        }
+        if (!responsavel) {
+            responsavel = document.getElementById('responsavel')?.value?.trim();
+        }
+        if (!setor) {
+            setor = document.getElementById('setor')?.value;
+        }
+        if (!porteSelect) {
+            porteSelect = document.getElementById('porte')?.value;
+        }
+        if (!faturamento) {
+            faturamento = document.getElementById('faturamento')?.value;
+        }
+        if (!cidade) {
+            cidade = document.getElementById('cidade')?.value?.trim();
+        }
+        
+        console.log('📊 Dados coletados:', {
+            nomeEmpresa,
+            responsavel,
+            setor,
+            porteSelect,
+            faturamento,
+            cidade
+        });
+        
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 2: VALIDAÇÕES
+        // ═══════════════════════════════════════════════════════════════
+        
         if (!nomeEmpresa) {
             alert('⚠️ Nome da empresa é obrigatório!');
+            console.error('❌ Validação falhou: nome vazio');
             return;
         }
         
         if (!setor) {
             alert('⚠️ Setor é obrigatório!');
+            console.error('❌ Validação falhou: setor vazio');
             return;
         }
         
         if (!porteSelect) {
             alert('⚠️ Porte é obrigatório!');
+            console.error('❌ Validação falhou: porte vazio');
             return;
         }
         
-        // Converter porte para formato correto do banco
+        console.log('✅ Validações básicas OK');
+        
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 3: PREPARAR DADOS PARA O BACKEND
+        // ═══════════════════════════════════════════════════════════════
+        
+        // Converter porte para formato do banco
         let porteFormatado;
         if (porteSelect === 'micro' || porteSelect === 'Micro') {
             porteFormatado = 'Micro';
@@ -11395,39 +11453,45 @@ async function salvarEmpresa() {
             porteFormatado = 'Pequena'; // default
         }
         
-        // Converter faturamento mensal para anual
-        const faturamentoAnual = faturamento * 12;
+        // Converter faturamento
+        const faturamentoMensal = parseFloat(faturamento) || 0;
+        const faturamentoAnual = faturamentoMensal * 12;
         
-        console.log('📊 Dados coletados:', {
-            nomeEmpresa,
-            setor,
-            porte: porteFormatado,
-            faturamentoAnual
-        });
-        
-        // Preparar objeto para enviar ao backend
+        // Preparar objeto
         const empresaData = {
             nome_empresa: nomeEmpresa,
             setor: setor,
             porte: porteFormatado,
             faturamento_anual: faturamentoAnual,
-           dados_completos: {
-    responsavel: responsavel || '',
-    cidade: cidadeEstado || ''
-}
+            dados_completos: {
+                responsavel: responsavel || '',
+                cidade: cidade || '',
+                faturamento_mensal: faturamentoMensal
+            }
         };
         
-        // Pegar token
+        console.log('📦 Payload preparado:', empresaData);
+        
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 4: PEGAR TOKEN
+        // ═══════════════════════════════════════════════════════════════
+        
         const token = localStorage.getItem('token');
         if (!token) {
             alert('⚠️ Sessão expirada. Faça login novamente.');
+            console.error('❌ Token não encontrado');
             irPara('login');
             return;
         }
         
+        console.log('🔑 Token encontrado');
+        
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 5: FAZER REQUISIÇÃO AO BACKEND
+        // ═══════════════════════════════════════════════════════════════
+        
         console.log('🚀 Enviando para backend:', BACKEND_URL + '/empresas');
         
-        // Fazer POST para o backend
         const response = await fetch(`${BACKEND_URL}/empresas`, {
             method: 'POST',
             headers: {
@@ -11437,54 +11501,84 @@ async function salvarEmpresa() {
             body: JSON.stringify(empresaData)
         });
         
-        console.log('📡 Response status:', response.status);
+        console.log('📡 Status da resposta:', response.status);
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('❌ Erro do backend:', errorData);
-            throw new Error(errorData.error || `Erro HTTP ${response.status}`);
-        }
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 6: PROCESSAR RESPOSTA
+        // ═══════════════════════════════════════════════════════════════
         
         const data = await response.json();
-        console.log('✅ Resposta do backend:', data);
+        console.log('📥 Resposta do backend:', data);
+        
+        if (!response.ok) {
+            console.error('❌ Erro do backend:', data);
+            throw new Error(data.error || `Erro HTTP ${response.status}`);
+        }
         
         if (!data.empresa || !data.empresa.id) {
+            console.error('❌ Backend não retornou ID da empresa');
             throw new Error('Backend não retornou ID da empresa');
         }
         
-        // Salvar no localStorage DEPOIS de confirmar que salvou no backend
+        console.log('✅ Empresa criada no backend! ID:', data.empresa.id);
+        
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 7: SALVAR NO LOCALSTORAGE
+        // ═══════════════════════════════════════════════════════════════
+        
         const empresaId = data.empresa.id;
         localStorage.setItem('empresa_ativa', empresaId);
         
-        // Criar objeto diagnóstico para localStorage
+        // Objeto para diagnóstico
         const diagnostico = {
             empresa_id: empresaId,
             nome_empresa: nomeEmpresa,
             setor: setor,
-            porte: porteSelect, // usa o valor original para o diagnóstico
-            faturamento_mensal: faturamento,
-            responsavel: responsavel,
-            cidade_estado: cidadeEstado
+            porte: porteSelect,
+            faturamento_mensal: faturamentoMensal,
+            responsavel: responsavel || '',
+            cidade_estado: cidade || ''
         };
         
         localStorage.setItem('diagnostico', JSON.stringify(diagnostico));
         
-        console.log('💾 Salvo no localStorage:', empresaId);
+        console.log('💾 Salvo no localStorage');
         
-        // Mostrar mensagem de sucesso
+        // ═══════════════════════════════════════════════════════════════
+        // PASSO 8: FEEDBACK E REDIRECIONAMENTO
+        // ═══════════════════════════════════════════════════════════════
+        
         alert('✅ Empresa salva com sucesso!');
         
+        // Fechar modal se existir
+        const modal = document.getElementById('modal-empresa');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        
+        // Limpar formulário
+        const formEmpresa = document.getElementById('form-empresa');
+        if (formEmpresa) {
+            formEmpresa.reset();
+        }
+        
         // Recarregar lista de empresas
-        await carregarEmpresas();
+        if (typeof carregarEmpresas === 'function') {
+            await carregarEmpresas();
+        }
         
         // Ir para diagnóstico
         irPara('diagnostico');
         
+        console.log('🎉 Processo completo!');
+        
     } catch (error) {
         console.error('❌ Erro ao salvar empresa:', error);
+        console.error('Stack:', error.stack);
         alert(`❌ Erro ao salvar empresa: ${error.message}\n\nVerifique o console (F12) para mais detalhes.`);
     }
 }
+
 
 // Excluir empresa
 function excluirEmpresa(id) {
